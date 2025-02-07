@@ -169,6 +169,14 @@ async function main() {
 				logger.info(`${state} ${chalk.gray(link.url)}`);
 				break;
 			}
+
+			case LinkState.REDIRECT: {
+				state = `[${chalk.yellow('RDR')}]`;
+				logger.info(
+					`${state} ${chalk.gray(link.url)} -> ${chalk.gray(link.redirectUrl)}`,
+				);
+				break;
+			}
 		}
 
 		if (format === Format.CSV) {
