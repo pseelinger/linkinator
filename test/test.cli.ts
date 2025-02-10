@@ -89,6 +89,17 @@ describe('cli', function () {
 		assert.match(stderr, /scanned 2 links/);
 	});
 
+	it('should flag redirects', async () => {
+		const response = await execa(node, [
+			linkinator,
+			'--verbosity',
+			'INFO',
+			'test/fixtures/redirect/cli.html',
+		]);
+		const stdout = stripAnsi(response.stdout);
+		assert.match(stdout, /\[RDR]/);
+	});
+
 	it('should provide CSV if asked nicely', async () => {
 		const response = await execa(node, [
 			linkinator,

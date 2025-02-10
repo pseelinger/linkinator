@@ -20,6 +20,7 @@ export enum LinkState {
 	OK = 'OK',
 	BROKEN = 'BROKEN',
 	SKIPPED = 'SKIPPED',
+	REDIRECT = 'REDIRECT',
 }
 
 export type RetryInfo = {
@@ -30,6 +31,7 @@ export type RetryInfo = {
 
 export type LinkResult = {
 	url: string;
+	redirectUrl?: string;
 	status?: number;
 	state: LinkState;
 	parent?: string;
@@ -332,6 +334,12 @@ export class LinkChecker extends EventEmitter {
 			parent: mapUrl(options.parent, options.checkOptions),
 			failureDetails: failures,
 		};
+		if (response?.request?.responseURL) {
+			if (response.request.responseURL !== options.url.href) {
+				result.state = LinkState.REDIRECT;
+				result.redirectUrl = response.request.responseURL;
+			}
+		}
 		options.results.push(result);
 		this.emit('link', result);
 

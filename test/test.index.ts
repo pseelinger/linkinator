@@ -60,6 +60,29 @@ describe('linkinator', () => {
 		);
 	});
 
+	it('should include a redirectUrl when it finds a redirect', async () => {
+		const scope = nock('http://redirect2.local').head('/').reply(200);
+		const scope2 = nock('http://redirect.local')
+			.head('/')
+			.reply(302, undefined, {
+				location: 'http://redirect2.local',
+			});
+		const results = await check({
+			path: 'test/fixtures/redirect',
+		});
+		assert.ok(results.passed);
+		const redirectedLinks = results.links.filter(
+			(x) => x.state === LinkState.REDIRECT,
+		);
+		assert.strictEqual(redirectedLinks.length, 1);
+		assert.strictEqual(
+			redirectedLinks[0].redirectUrl,
+			'http://redirect2.local/',
+		);
+		scope.done();
+		scope2.done();
+	});
+
 	it('should skip links if passed a linksToSkip function', async () => {
 		const scope = nock('https://good.com').head('/').reply(200);
 		const results = await check({

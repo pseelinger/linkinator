@@ -169,6 +169,14 @@ async function main() {
 				logger.info(`${state} ${chalk.gray(link.url)}`);
 				break;
 			}
+
+			case LinkState.REDIRECT: {
+				state = `[${chalk.yellow('RDR')}]`;
+				logger.info(
+					`${state} ${chalk.gray(link.url)} -> ${chalk.gray(link.redirectUrl)}`,
+				);
+				break;
+			}
 		}
 
 		if (format === Format.CSV) {
@@ -267,7 +275,10 @@ async function main() {
 				return true;
 			}
 
-			if (link.state === LinkState.OK && verbosity <= LogLevel.WARNING) {
+			if (
+				(link.state === LinkState.OK || link.state === LinkState.REDIRECT) &&
+				verbosity <= LogLevel.WARNING
+			) {
 				return true;
 			}
 
@@ -301,6 +312,14 @@ async function main() {
 				case LinkState.SKIPPED: {
 					state = `[${chalk.grey('SKP')}]`;
 					logger.info(`  ${state} ${chalk.gray(link.url)}`);
+					break;
+				}
+
+				case LinkState.REDIRECT: {
+					state = `[${chalk.yellow('RDR')}]`;
+					logger.info(
+						`${state} ${chalk.gray(link.url)} -> ${chalk.gray(link.redirectUrl)}`,
+					);
 					break;
 				}
 			}
@@ -377,6 +396,10 @@ function parseFormat(flags: Flags): Format {
 function shouldShowResult(link: LinkResult, verbosity: LogLevel) {
 	switch (link.state) {
 		case LinkState.OK: {
+			return verbosity <= LogLevel.WARNING;
+		}
+
+		case LinkState.REDIRECT: {
 			return verbosity <= LogLevel.WARNING;
 		}
 
