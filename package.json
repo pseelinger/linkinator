@@ -16,7 +16,6 @@
 		"prepare": "husky && npm run build",
 		"coverage": "c8 report --reporter=json",
 		"build": "tsc -p .",
-		"postinstall": "tsc -p .",
 		"test": "c8 mocha build/test",
 		"fix": "biome check --write .",
 		"lint": "biome check .",
